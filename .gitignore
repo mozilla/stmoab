@@ -1,3 +1,5 @@
 .coverage
+dist/*
 .DS_Store
 *.pyc
+stmoab.egg-info/*
