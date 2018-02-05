@@ -1,5 +1,6 @@
 import time
 
+from redash_client.client import RedashClient
 from redash_client.constants import (
     VizWidth, VizType, ChartType, TimeInterval)
 
@@ -37,7 +38,7 @@ class SummaryDashboard(object):
   class SummaryDashboardException(Exception):
     pass
 
-  def __init__(self, redash_client, dash_name, events_table_name,
+  def __init__(self, api_key, dash_name, events_table_name,
                start_date, end_date=None):
     self._dash_name = dash_name
     self._events_table = events_table_name
@@ -48,7 +49,7 @@ class SummaryDashboard(object):
         "end_date": self._end_date
     }
 
-    self.redash = redash_client
+    self.redash = RedashClient(api_key)
     self._dash_id = self.redash.create_new_dashboard(self._dash_name)
     self.redash.publish_dashboard(self._dash_id)
     self.public_url = self.redash.get_public_url(self._dash_id)

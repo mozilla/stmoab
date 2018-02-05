@@ -19,7 +19,7 @@ class TestActivityStreamExperimentDashboard(AppTest):
     self.mock_requests_post.return_value = self.get_mock_response()
 
     dashboard = ActivityStreamExperimentDashboard(
-        self.redash,
+        self.API_KEY,
         self.DASH_PROJECT,
         self.DASH_NAME,
         self.EXPERIMENT_ID,

@@ -37,12 +37,12 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
   DISABLE_TITLE = "Disable Rate"
   RETENTION_DIFF_TITLE = "Daily Retention Difference (Experiment - Control)"
 
-  def __init__(self, redash_client, project_name, dash_name, exp_id,
+  def __init__(self, api_key, project_name, dash_name, exp_id,
                start_date=None, end_date=None):
     DASH_TITLE = "{project}: {dash}".format(
         project=project_name, dash=dash_name)
     super(ActivityStreamExperimentDashboard, self).__init__(
-        redash_client,
+        api_key,
         DASH_TITLE,
         self.DEFAULT_EVENTS_TABLE,
         start_date, end_date)

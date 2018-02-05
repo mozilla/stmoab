@@ -1,7 +1,5 @@
 import os
 
-from redash_client.client import RedashClient
-
 from stmoab.StatisticalDashboard import StatisticalDashboard
 
 '''
@@ -179,14 +177,12 @@ if __name__ == '__main__':
   aws_secret_key = os.environ['AWS_SECRET_KEY']
   s3_bucket_id_stats = os.environ['S3_BUCKET_ID_STATS']
 
-  redash_client = RedashClient(api_key)
-
   PING_CENTRE_TTABLE = "Statistical Analysis - Ping Centre"
   UT_TTABLE = "Statistical Analysis - UT"
   UT_HOURLY_TTABLE = "Statistical Analysis (Per Active Hour) - UT"
 
   dash = StatisticalDashboard(
-    redash_client,
+    api_key,
     "Activity Stream System Addon Experiment",
     "57 Release",
     "pref-flip-activity-stream-57-release-enabled-existing-users-bug-1415966",

@@ -29,7 +29,7 @@ class TestStatisticalDashboard(AppTest):
     self.addCleanup(mock_boto_transfer_patcher.stop)
 
     dashboard = StatisticalDashboard(
-        self.redash,
+        self.API_KEY,
         self.AWS_ACCESS_KEY,
         self.AWS_SECRET_KEY,
         self.AWS_BUCKET_ID,

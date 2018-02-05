@@ -2,7 +2,6 @@ import mock
 import json
 import unittest
 
-from redash_client.client import RedashClient
 from stmoab.SummaryDashboard import SummaryDashboard
 
 
@@ -39,7 +38,7 @@ class AppTest(unittest.TestCase):
     self.mock_requests_post.return_value = self.get_mock_response()
 
     dashboard = SummaryDashboard(
-        self.redash,
+        self.API_KEY,
         DASH_NAME,
         EVENTS_TABLE_NAME,
         START_DATE,
@@ -47,9 +46,7 @@ class AppTest(unittest.TestCase):
     return dashboard
 
   def setUp(self):
-    API_KEY = "test_key"
-
-    self.redash = RedashClient(API_KEY)
+    self.API_KEY = "test_key"
 
     mock_requests_post_patcher = mock.patch(
         "redash_client.client.requests.post")
@@ -66,7 +63,7 @@ class AppTest(unittest.TestCase):
     self.mock_requests_delete = mock_requests_delete_patcher.start()
     self.addCleanup(mock_requests_delete_patcher.stop)
 
-    self.dash = self.get_dashboard(API_KEY)
+    self.dash = self.get_dashboard(self.API_KEY)
 
   def get_mock_response(self, status=200, content='{}'):
     mock_response = mock.Mock()

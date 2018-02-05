@@ -25,12 +25,12 @@ class StatisticalDashboard(ActivityStreamExperimentDashboard):
 
 
   def __init__(
-      self, redash_client, aws_access_key, aws_secret_key,
+      self, api_key, aws_access_key, aws_secret_key,
       s3_bucket_id, project_name, dash_name, exp_id,
       start_date=None, end_date=None
   ):
     super(StatisticalDashboard, self).__init__(
-        redash_client,
+        api_key,
         project_name,
         dash_name,
         exp_id,
