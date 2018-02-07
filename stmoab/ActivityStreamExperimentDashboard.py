@@ -112,13 +112,14 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
     if template["description"]:
       description = template["description"]
 
-    self._add_template_to_dashboard(
+    public_url = self._add_template_to_dashboard(
         template,
         chart_data,
         title,
         VizWidth.WIDE,
         description
     )
+    return public_url
 
   def _apply_event_template(self, template, chart_data,
                             events_list, events_table, title=None):
@@ -148,7 +149,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
     self._logger.info(("ActivityStreamExperimentDashboard: "
                        "New {title} graph is being added"
                        .format(title=title)))
-    self._add_forked_query_to_dashboard(
+    public_url = self._add_forked_query_to_dashboard(
         title,
         template["id"],
         self._params,
@@ -157,6 +158,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
         template["type"],
         description
     )
+    return public_url
 
   def _apply_functions_to_templates(
       self, template_keyword, events_list, events_table,
@@ -169,6 +171,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
     templates = self.redash.search_queries(template_keyword)
     chart_data = self.get_query_ids_and_names()
 
+    public_urls = []
     for template in templates:
       if "event" in template["name"].lower():
         self._logger.info((
@@ -186,7 +189,10 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
             "ActivityStreamExperimentDashboard: "
             "Processing template '{template_name}'"
             .format(template_name=template["name"])))
-        general_function(template, chart_data)
+        public_url = general_function(template, chart_data)
+        public_urls.append(public_url)
+
+    return public_urls
 
   def add_graph_templates(self, template_keyword,
                           events_list=None, events_table=None):
@@ -196,10 +202,11 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
     if events_list is None:
       events_list = self.DEFAULT_EVENTS
 
-    self._apply_functions_to_templates(
+    public_urls = self._apply_functions_to_templates(
         template_keyword,
         events_list,
         events_table,
         self._apply_event_template,
         self._apply_non_event_template
     )
+    return public_urls

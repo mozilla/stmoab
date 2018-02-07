@@ -92,7 +92,11 @@ class TestActivityStreamExperimentDashboard(AppTest):
     self.mock_requests_post.side_effect = self.post_server
     self.mock_requests_get.side_effect = get_server
 
-    self.dash.add_graph_templates("Template:")
+    public_urls = self.dash.add_graph_templates("Template:")
+
+    # In the searched queries above, there is only one non-event query
+    self.assertEqual(len(public_urls), 1)
+    self.assertIsNotNone(public_urls[0])
 
     # GET calls:
     #     1) Create dashboard

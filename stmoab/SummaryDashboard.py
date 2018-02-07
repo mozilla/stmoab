@@ -140,8 +140,10 @@ class SummaryDashboard(object):
     adjusted_string = fork["query"].replace("{{{", "{").replace("}}}", "}")
     sql_query = adjusted_string.format(**query_params)
 
+    query_id = fork["id"]
+
     self.redash.update_query(
-        fork["id"],
+        query_id,
         query_title,
         sql_query,
         fork["data_source_id"],
@@ -149,13 +151,17 @@ class SummaryDashboard(object):
     )
 
     viz_id = self.redash.make_new_visualization_request(
-        fork["id"],
+        query_id,
         visualization_type,
         options,
         visualization_name,
     )
     self.redash.add_visualization_to_dashboard(
         self._dash_id, viz_id, visualization_width)
+
+    public_url = self.redash.get_visualization_public_url(query_id, viz_id)
+
+    return public_url
 
   def _add_query_to_dashboard(self, query_title, query_string,
                               data_source, visualization_width,
