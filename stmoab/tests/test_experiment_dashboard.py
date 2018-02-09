@@ -27,6 +27,14 @@ class TestExperimentDashboard(AppTest):
     )
     return dashboard
 
+  def test_apply_functions_to_templates_exception_thrown(self):
+    self._setupMockRedashClientException("search_queries")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to find query templates for keyword",
+        lambda: self.dash._apply_functions_to_templates("a", "b", "c", "d",))
+
   def test_correct_values_at_initialization(self):
     self.assertEqual(self.dash._experiment_id, self.EXPERIMENT_ID)
     self.assertEqual(

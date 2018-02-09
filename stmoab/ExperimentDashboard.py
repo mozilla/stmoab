@@ -168,7 +168,15 @@ class ExperimentDashboard(SummaryDashboard):
       events_table = self._events_table
     self._params["events_table"] = events_table
 
-    templates = self.redash.search_queries(template_keyword)
+    templates = []
+    try:
+      templates = self.redash.search_queries(template_keyword)
+    except self.redash.RedashClientException as e:
+        raise self.ExternalAPIError((
+          "Unable to find query templates for "
+          "keyword '{keyword}': {error}").format(
+              keyword=template_keyword, error=e))
+
     chart_data = self.get_query_ids_and_names()
 
     public_urls = []

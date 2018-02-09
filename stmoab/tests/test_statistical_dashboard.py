@@ -40,6 +40,15 @@ class TestStatisticalDashboard(AppTest):
     )
     return dashboard
 
+  def test_get_ttable_data_exception_thrown(self):
+    self._setupMockRedashClientException("get_query_results")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to fetch t-test results",
+        lambda: self.dash._get_ttable_data_for_query(
+            "a", "b", "c", "d"))
+
   def test_pooled_stddev(self):
     exp_vals = [1, 2, 3]
     control_vals = [4, 6, 8]

@@ -104,8 +104,14 @@ class StatisticalDashboard(ExperimentDashboard):
 
   def _get_ttable_data_for_query(self, label, query_string,
                                  column_name, data_source_id):
-    data = self.redash.get_query_results(
-        query_string, data_source_id)
+    data = None
+    try:
+      data = self.redash.get_query_results(
+          query_string, data_source_id)
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+        "Unable to fetch t-test results for '{metric}' "
+        "metric: {error}".format(metric=label, error=e))
 
     if data is None or len(data) <= 3 or (column_name not in data[0]):
       return {}
@@ -147,7 +153,7 @@ class StatisticalDashboard(ExperimentDashboard):
           "{{{", "{").replace("}}}", "}")
       query_string = adjusted_string.format(**self._params)
 
-      self.redash.update_query(
+      self._update_query(
           template["id"],
           template["name"],
           template["query"],
@@ -155,6 +161,7 @@ class StatisticalDashboard(ExperimentDashboard):
           event_data["description"],
           options
       )
+
       ttable_row = self._get_ttable_data_for_query(
           event_data["title"],
           query_string,
@@ -214,11 +221,11 @@ class StatisticalDashboard(ExperimentDashboard):
         self._s3_bucket,
         self._ttables[title],
     )
-    query_id, table_id = self.redash.create_new_query(
+    query_id, table_id = self._create_new_query(
         title,
         query_string,
         self.URL_FETCHER_DATA_SOURCE_ID,
         self.TTABLE_DESCRIPTION,
     )
-    self.redash.add_visualization_to_dashboard(
-        self._dash_id, table_id, VizWidth.WIDE)
+    self._add_visualization_to_dashboard(table_id, VizWidth.WIDE)
+
