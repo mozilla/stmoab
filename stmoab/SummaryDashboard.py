@@ -35,7 +35,7 @@ class SummaryDashboard(object):
       },
   }
 
-  class SummaryDashboardException(Exception):
+  class ExternalAPIError(Exception):
     pass
 
   def __init__(self, api_key, dash_name, events_table_name,
@@ -49,13 +49,82 @@ class SummaryDashboard(object):
         "end_date": self._end_date
     }
 
-    self.redash = RedashClient(api_key)
-    self._dash_id = self.redash.create_new_dashboard(self._dash_name)
-    self.redash.publish_dashboard(self._dash_id)
-    self.public_url = self.redash.get_public_url(self._dash_id)
+    try:
+      self.redash = RedashClient(api_key)
+      self._dash_id = self.redash.create_new_dashboard(self._dash_name)
+      self.redash.publish_dashboard(self._dash_id)
+      self.public_url = self.redash.get_public_url(self._dash_id)
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+          "Unable to create new dashboard: {error}".format(error=e), e)
+
+  def _create_new_query(self, query_title, query_string,
+                        data_source, description=""):
+    try:
+      query_id, table_id = self.redash.create_new_query(
+        query_title, query_string, data_source, description=None)
+      return query_id, table_id
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+          "Unable to create query titled '{title}': {error}".format(
+              title=query_title, error=e))
+
+  def _add_visualization_to_dashboard(self, viz_id, visualization_width):
+    try:
+      self.redash.add_visualization_to_dashboard(
+        self._dash_id, viz_id, visualization_width)
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+          ("Unable to add visualization '{id}' to "
+           "dashboard '{title}': {error}").format(
+              id=viz_id, title=self._dash_name, error=e))
+
+  def _create_new_visualization(self, query_id, visualization_type,
+                                visualization_name, chart_type,
+                                column_mapping, series_options,
+                                time_interval, stacking):
+    try:
+      viz_id = self.redash.create_new_visualization(
+          query_id,
+          visualization_type,
+          visualization_name,
+          chart_type,
+          column_mapping,
+          series_options,
+          time_interval,
+          stacking,
+      )
+      return viz_id
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+          "Unable to create visualization titled '{title}': {error}".format(
+              title=visualization_name, error=e))
+
+  def _get_widgets_from_dash(self, dash_name):
+    try:
+      return self.redash.get_widget_from_dash(dash_name)
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+          "Unable to access dashboard widgets: {error}".format(error=e), e)
+
+  def _update_query(self, query_id, query_title, sql,
+                    data_source_id, description="", options=""):
+    try:
+      self.redash.update_query(
+          query_id,
+          query_title,
+          sql,
+          data_source_id,
+          description,
+          options,
+      )
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+          "Unable to update query {title}: {error}".format(
+              title=query_title, error=e))
 
   def update_refresh_schedule(self, seconds_to_refresh):
-    widgets = self.redash.get_widget_from_dash(self._dash_name)
+    widgets = self._get_widgets_from_dash(self._dash_name)
 
     for widget in widgets:
       widget_id = widget.get(
@@ -64,10 +133,15 @@ class SummaryDashboard(object):
       if not widget_id:
         continue
 
-      self.redash.update_query_schedule(widget_id, seconds_to_refresh)
+      try:
+        self.redash.update_query_schedule(widget_id, seconds_to_refresh)
+      except self.redash.RedashClientException as e:
+        raise self.ExternalAPIError(
+          "Unable to update schedule for widget {widget_id}: {error}".format(
+              widget_id=widget_id, error=e))
 
   def get_query_ids_and_names(self):
-    widgets = self.redash.get_widget_from_dash(self._dash_name)
+    widgets = self._get_widgets_from_dash(self._dash_name)
 
     data = {}
     for widget in widgets:
@@ -94,11 +168,17 @@ class SummaryDashboard(object):
     return data
 
   def remove_graph_from_dashboard(self, widget_id, query_id):
-    if widget_id is not None:
-      self.redash.remove_visualization(widget_id)
+    try:
+      if widget_id is not None:
+        self.redash.remove_visualization(widget_id)
 
-    if query_id is not None:
-      self.redash.delete_query(query_id)
+      if query_id is not None:
+        self.redash.delete_query(query_id)
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+        "Unable to remove widget {widget_id} with query ID "
+        "{query_id} from dashboard: {error}".format(
+            widget_id=widget_id, query_id=query_id, error=e))
 
   def remove_all_graphs(self):
     widgets = self.get_query_ids_and_names()
@@ -142,26 +222,29 @@ class SummaryDashboard(object):
 
     query_id = fork["id"]
 
-    self.redash.update_query(
+    self._update_query(
         query_id,
         query_title,
         sql_query,
-        fork["data_source_id"],
-        "",
+        fork["data_source_id"]
     )
 
-    viz_id = self.redash.make_new_visualization_request(
-        query_id,
-        visualization_type,
-        options,
-        visualization_name,
-    )
-    self.redash.add_visualization_to_dashboard(
-        self._dash_id, viz_id, visualization_width)
+    try:
+      viz_id = self.redash.make_new_visualization_request(
+          query_id,
+          visualization_type,
+          options,
+          visualization_name,
+      )
+      self._add_visualization_to_dashboard(viz_id, visualization_width)
 
-    public_url = self.redash.get_visualization_public_url(query_id, viz_id)
+      public_url = self.redash.get_visualization_public_url(query_id, viz_id)
 
-    return public_url
+      return public_url
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+        "Unable to add forked query {query_id} to "
+        "dashboard: {error}".format(query_id=parent_query_id, error=e))
 
   def _add_query_to_dashboard(self, query_title, query_string,
                               data_source, visualization_width,
@@ -170,9 +253,9 @@ class SummaryDashboard(object):
                               column_mapping=None, series_options=None,
                               time_interval=None, stacking=True):
 
-    query_id, table_id = self.redash.create_new_query(
+    query_id, table_id = self._create_new_query(
         query_title, query_string, data_source)
-    viz_id = self.redash.create_new_visualization(
+    viz_id = self._create_new_visualization(
         query_id,
         visualization_type,
         visualization_name,
@@ -182,8 +265,7 @@ class SummaryDashboard(object):
         time_interval,
         stacking,
     )
-    self.redash.add_visualization_to_dashboard(
-        self._dash_id, viz_id, visualization_width)
+    self._add_visualization_to_dashboard(viz_id, visualization_width)
 
   def add_mau_dau(self, where_clause=""):
     if self.MAU_DAU_TITLE in self.get_query_ids_and_names():

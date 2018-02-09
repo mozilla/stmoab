@@ -7,6 +7,23 @@ from stmoab.SummaryDashboard import SummaryDashboard
 
 class AppTest(unittest.TestCase):
 
+  def _setupMockRedashClientException(self, functionToPatch,
+                                      newFunction=None):
+    mock_function_patcher = mock.patch(
+        "stmoab.SummaryDashboard.RedashClient.{patchable}".format(
+            patchable=functionToPatch))
+    self.mock_function = mock_function_patcher.start()
+    self.addCleanup(mock_function_patcher.stop)
+
+    def redash_client_exception_raiser(*args, **kwargs):
+      raise self.dash.redash.RedashClientException
+
+    mockFunctionality = redash_client_exception_raiser
+    if newFunction is not None:
+        mockFunctionality = newFunction
+
+    self.mock_function.side_effect = mockFunctionality
+
   def post_server(self, url, data):
     EXPECTED_QUERY_ID = "query_id123"
     EXPECTED_QUERY_STRING = "select some_stuff from table"

@@ -3,9 +3,110 @@ import json
 from stmoab.constants import RetentionType
 from stmoab.tests.base import AppTest
 from stmoab.templates import active_users
+from stmoab.SummaryDashboard import SummaryDashboard
 
 
 class TestSummaryDashboard(AppTest):
+
+  def test_init_exception_thrown(self):
+    self._setupMockRedashClientException("create_new_dashboard")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to create new dashboard",
+        lambda: SummaryDashboard("a", "b", "c", "d",))
+
+  def test_add_visualization_to_dash_exception_thrown(self):
+    self._setupMockRedashClientException("add_visualization_to_dashboard")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to add visualization",
+        lambda: self.dash._add_visualization_to_dashboard("a", "b"))
+
+  def test_update_query_exception_thrown(self):
+    self._setupMockRedashClientException("update_query")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to update query",
+        lambda: self.dash._update_query("a", "b", "c", "d",))
+
+  def test_create_new_query_exception_thrown(self):
+    self._setupMockRedashClientException("create_new_query")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to create query titled",
+        lambda: self.dash._create_new_query("a", "b", "c"))
+
+  def test_create_new_visualization_exception_thrown(self):
+    self._setupMockRedashClientException("create_new_visualization")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to create visualization titled",
+        lambda: self.dash._create_new_visualization(
+            "a", "b", "c", "d", "e", "f", "g", "h"))
+
+  def test_get_widgets_from_dash_exception_thrown(self):
+    self._setupMockRedashClientException("get_widget_from_dash")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to access dashboard widgets",
+        lambda: self.dash._get_widgets_from_dash("dash_name"))
+
+  def test_remove_graph_from_dashboard_exception_thrown(self):
+    self._setupMockRedashClientException("remove_visualization")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to remove widget",
+        lambda: self.dash.remove_graph_from_dashboard(123, 456))
+
+  def test_add_forked_query_exception_thrown(self):
+    MOCK_WIDGET = {
+        "query": "SELECT thing FROM table",
+        "data_source_id": 5,
+        "id": 123
+    }
+    QUERY_PARAMS = {"a": "b"}
+
+    def fork_query(self):
+      return MOCK_WIDGET
+
+    self._setupMockRedashClientException(
+        "fork_query", fork_query)
+    self._setupMockRedashClientException("make_new_visualization_request")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to add forked query",
+        lambda: self.dash._add_forked_query_to_dashboard(
+            "title", "query_id", QUERY_PARAMS, None, None))
+
+  def test_update_refresh_schedule_exception_thrown(self):
+    MOCK_WIDGET = [{
+        "visualization": {
+            "query": {
+                "name": "query_name",
+                "id": 1
+            }
+        },
+        "id": 4}]
+
+    def get_widget_from_dash_mock(self):
+      return MOCK_WIDGET
+
+    self._setupMockRedashClientException(
+        "get_widget_from_dash", get_widget_from_dash_mock)
+    self._setupMockRedashClientException("update_query_schedule")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to update schedule for widget",
+        lambda: self.dash.update_refresh_schedule(1000))
 
   def test_update_refresh_schedule_success(self):
     EXPECTED_QUERY_ID = "query_id123"
