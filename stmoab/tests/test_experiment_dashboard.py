@@ -2,15 +2,15 @@ import json
 import time
 
 from stmoab.tests.base import AppTest
-from stmoab.ActivityStreamExperimentDashboard import (
-    ActivityStreamExperimentDashboard)
+from stmoab.ExperimentDashboard import (
+    ExperimentDashboard)
 
 
-class TestActivityStreamExperimentDashboard(AppTest):
+class TestExperimentDashboard(AppTest):
 
   START_DATE = "2017-17-02"
   END_DATE = time.strftime("%Y-%m-%d")
-  DASH_PROJECT = "Activity Stream Experiment"
+  DASH_PROJECT = "Test Experiment"
   DASH_NAME = "Screenshots Long Cache"
   EXPERIMENT_ID = "exp-014-screenshotsasync"
 
@@ -18,7 +18,7 @@ class TestActivityStreamExperimentDashboard(AppTest):
     self.mock_requests_get.return_value = self.get_mock_response()
     self.mock_requests_post.return_value = self.get_mock_response()
 
-    dashboard = ActivityStreamExperimentDashboard(
+    dashboard = ExperimentDashboard(
         self.API_KEY,
         self.DASH_PROJECT,
         self.DASH_NAME,
