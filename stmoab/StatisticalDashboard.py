@@ -7,11 +7,11 @@ from redash_client.constants import VizWidth
 
 from stmoab.utils import upload_as_json, create_boto_transfer
 from stmoab.constants import TTableSchema
-from stmoab.ActivityStreamExperimentDashboard import (
-    ActivityStreamExperimentDashboard)
+from stmoab.ExperimentDashboard import (
+    ExperimentDashboard)
 
 
-class StatisticalDashboard(ActivityStreamExperimentDashboard):
+class StatisticalDashboard(ExperimentDashboard):
   TTABLE_DESCRIPTION = (
     "Smaller p-values (e.g. <= 0.05) indicate a high "
     "probability that the variants have different distributions. Alpha "

@@ -5,7 +5,7 @@ from redash_client.constants import VizWidth
 from stmoab.SummaryDashboard import SummaryDashboard
 
 
-class ActivityStreamExperimentDashboard(SummaryDashboard):
+class ExperimentDashboard(SummaryDashboard):
   # These are either strings representing both the measurement name
   # event being measured or a key value pair: {<measurement_name>: <events>}
   DEFAULT_EVENTS = ["CLICK", "SEARCH", "BLOCK", "DELETE",
@@ -41,7 +41,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
                start_date=None, end_date=None):
     DASH_TITLE = "{project}: {dash}".format(
         project=project_name, dash=dash_name)
-    super(ActivityStreamExperimentDashboard, self).__init__(
+    super(ExperimentDashboard, self).__init__(
         api_key,
         DASH_TITLE,
         self.DEFAULT_EVENTS_TABLE,
@@ -54,7 +54,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
 
     self._params["experiment_id"] = self._experiment_id
     self._logger.info((
-        "ActivityStreamExperimentDashboard: {name} "
+        "ExperimentDashboard: {name} "
         "Initialization Complete".format(name=dash_name)))
 
   def _get_title(self, template_name):
@@ -138,7 +138,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
                                  viz_width, description):
     # Remove graphs if they already exist.
     if title in chart_data:
-      self._logger.info(("ActivityStreamExperimentDashboard: "
+      self._logger.info(("ExperimentDashboard: "
                          "{template} graph exists and is being removed"
                          .format(template=title)))
 
@@ -146,7 +146,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
       widget_id = chart_data[title]["widget_id"]
       self.remove_graph_from_dashboard(widget_id, query_id)
 
-    self._logger.info(("ActivityStreamExperimentDashboard: "
+    self._logger.info(("ExperimentDashboard: "
                        "New {title} graph is being added"
                        .format(title=title)))
     public_url = self._add_forked_query_to_dashboard(
@@ -175,7 +175,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
     for template in templates:
       if "event" in template["name"].lower():
         self._logger.info((
-            "ActivityStreamExperimentDashboard: "
+            "ExperimentDashboard: "
             "Processing template '{template_name}'"
             .format(template_name=template["name"])))
         events_function(
@@ -186,7 +186,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
             title)
       else:
         self._logger.info((
-            "ActivityStreamExperimentDashboard: "
+            "ExperimentDashboard: "
             "Processing template '{template_name}'"
             .format(template_name=template["name"])))
         public_url = general_function(template, chart_data)
@@ -197,7 +197,7 @@ class ActivityStreamExperimentDashboard(SummaryDashboard):
   def add_graph_templates(self, template_keyword,
                           events_list=None, events_table=None):
     self._logger.info(
-        "ActivityStreamExperimentDashboard: Adding templates.")
+        "ExperimentDashboard: Adding templates.")
 
     if events_list is None:
       events_list = self.DEFAULT_EVENTS
