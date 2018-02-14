@@ -79,6 +79,16 @@ class SummaryDashboard(object):
            "dashboard '{title}': {error}").format(
               id=viz_id, title=self._dash_name, error=e))
 
+  def _get_query_results(self, query_string, data_source_id, query_name=""):
+    try:
+      data = self.redash.get_query_results(
+          query_string, data_source_id)
+      return data
+    except self.redash.RedashClientException as e:
+      raise self.ExternalAPIError(
+        "Unable to fetch query results: '{query_name}' "
+        " {error}".format(query_name=query_name, error=e))
+
   def _create_new_visualization(self, query_id, visualization_type,
                                 visualization_name, chart_type,
                                 column_mapping, series_options,
@@ -211,29 +221,25 @@ class SummaryDashboard(object):
     }
     return mau_dau_column_mapping, engagement_ratio_column_mapping
 
-  def _add_forked_query_to_dashboard(
-      self, query_title, parent_query_id, query_params, visualization_width,
-      options, visualization_type=VizType.CHART, visualization_name="Chart"
-  ):
-
-    fork = self.redash.fork_query(parent_query_id)
-    adjusted_string = fork["query"].replace("{{{", "{").replace("}}}", "}")
+  def _populate_sql_string_with_variables(self, template_sql, query_params):
+    adjusted_string = template_sql.replace("{{{", "{").replace("}}}", "}")
     sql_query = adjusted_string.format(**query_params)
+    return sql_query
 
-    query_id = fork["id"]
+  def _add_copied_query_to_dashboard(
+      self, template, query_title, query_params, visualization_width,
+      visualization_name="Chart"
+  ):
+    query_string = self._populate_sql_string_with_variables(
+        template["query"], query_params)
 
-    self._update_query(
-        query_id,
-        query_title,
-        sql_query,
-        fork["data_source_id"]
-    )
-
+    query_id, table_id = self._create_new_query(
+        query_title, query_string, template["data_source_id"])
     try:
       viz_id = self.redash.make_new_visualization_request(
           query_id,
-          visualization_type,
-          options,
+          template["type"],
+          template["options"],
           visualization_name,
       )
       self._add_visualization_to_dashboard(viz_id, visualization_width)
@@ -243,8 +249,22 @@ class SummaryDashboard(object):
       return public_url
     except self.redash.RedashClientException as e:
       raise self.ExternalAPIError(
-        "Unable to add forked query {query_id} to "
-        "dashboard: {error}".format(query_id=parent_query_id, error=e))
+        "Unable to add copied query {query_id} to "
+        "dashboard: {error}".format(query_id=query_id, error=e))
+
+  def _template_copy_results_exist(
+      self, query_title, template_sql, data_source_id, query_params
+  ):
+    sql_query = self._populate_sql_string_with_variables(template_sql, query_params)
+    data = self._get_query_results(sql_query, data_source_id, query_title)
+
+    if data is None or len(data) == 0:
+      self._logger.info((
+          "Dashboard: Query '{name}' is still updating and will not be "
+          "not be displayed.".format(name=query_title)))
+      return False
+
+    return True
 
   def _add_query_to_dashboard(self, query_title, query_string,
                               data_source, visualization_width,

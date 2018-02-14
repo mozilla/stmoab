@@ -136,6 +136,16 @@ class ExperimentDashboard(SummaryDashboard):
 
   def _add_template_to_dashboard(self, template, chart_data, title,
                                  viz_width, description):
+    data_ready = self._template_copy_results_exist(
+      title,
+      template["query"],
+      template["data_source_id"],
+      self._params,
+    )
+
+    if not data_ready:
+      return
+
     # Remove graphs if they already exist.
     if title in chart_data:
       self._logger.info(("ExperimentDashboard: "
@@ -149,13 +159,12 @@ class ExperimentDashboard(SummaryDashboard):
     self._logger.info(("ExperimentDashboard: "
                        "New {title} graph is being added"
                        .format(title=title)))
-    public_url = self._add_forked_query_to_dashboard(
+
+    public_url = self._add_copied_query_to_dashboard(
+        template,
         title,
-        template["id"],
         self._params,
         viz_width,
-        template["options"],
-        template["type"],
         description
     )
     return public_url
