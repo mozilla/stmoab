@@ -104,14 +104,7 @@ class StatisticalDashboard(ExperimentDashboard):
 
   def _get_ttable_data_for_query(self, label, query_string,
                                  column_name, data_source_id):
-    data = None
-    try:
-      data = self.redash.get_query_results(
-          query_string, data_source_id)
-    except self.redash.RedashClientException as e:
-      raise self.ExternalAPIError(
-        "Unable to fetch t-test results for '{metric}' "
-        "metric: {error}".format(metric=label, error=e))
+    data = self._get_query_results(query_string, data_source_id, label)
 
     if data is None or len(data) <= 3 or (column_name not in data[0]):
       return {}

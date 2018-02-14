@@ -180,14 +180,20 @@ if __name__ == '__main__':
   PING_CENTRE_TTABLE = "Statistical Analysis - Ping Centre"
   UT_TTABLE = "Statistical Analysis - UT"
   UT_HOURLY_TTABLE = "Statistical Analysis (Per Active Hour) - UT"
+  POPULATION_TEMPLATE = 'UT Experiment Template: Population Size'
 
   dash = StatisticalDashboard(
     api_key,
-    "Activity Stream System Addon Experiment",
-    "57 Release",
-    "pref-flip-activity-stream-57-release-enabled-existing-users-bug-1415966",
-    start_date="2017-11-14"
+    aws_access_key,
+    aws_secret_key,
+    s3_bucket_id_stats,
+    "Pocket Experiment",
+    "Sponsored Stories",
+    "pref-flip-activity-stream-59-beta-pocket-sponsored-stories-bug-1432989",
+    start_date="2018-01-29"
   )
+
+  dash.add_graph_templates(POPULATION_TEMPLATE)
 
   # Average Events per Day UT
   #dash.add_graph_templates("AS Template UT One:", dash.UT_EVENTS)

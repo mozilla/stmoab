@@ -24,6 +24,14 @@ class TestSummaryDashboard(AppTest):
         "Unable to add visualization",
         lambda: self.dash._add_visualization_to_dashboard("a", "b"))
 
+  def test_get_query_results_exception_thrown(self):
+    self._setupMockRedashClientException("get_query_results")
+
+    self.assertRaisesRegexp(
+        self.dash.ExternalAPIError,
+        "Unable to fetch query results",
+        lambda: self.dash._get_query_results("a", "b"))
+
   def test_update_query_exception_thrown(self):
     self._setupMockRedashClientException("update_query")
 
