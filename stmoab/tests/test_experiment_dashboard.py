@@ -55,13 +55,22 @@ class TestExperimentDashboard(AppTest):
         "id": 5,
         "description": "SomeQuery",
         "name": "AS Template: Query Title Event",
+        "query": "SELECT * FROM table",
         "data_source_id": 5
     }, {
         "id": 6,
         "description": "SomeQuery2",
         "name": "AS Template: Query Title",
+        "query": "SELECT * FROM table",
         "data_source_id": 5
     }]
+    QUERY_RESULTS_RESPONSE = {
+        "query_result": {
+            "data": {
+                "rows": [{"a": "b"}, {"c": "d"}]
+            }
+        }
+    }
     VISUALIZATIONS_FOR_QUERY = {
         "visualizations": [
             {"options": {}},
@@ -97,7 +106,8 @@ class TestExperimentDashboard(AppTest):
 
     self.server_calls = 0
     self.mock_requests_delete.return_value = self.get_mock_response()
-    self.mock_requests_post.side_effect = self.post_server
+    self.mock_requests_post.return_value = self.get_mock_response(
+        content=json.dumps(QUERY_RESULTS_RESPONSE))
     self.mock_requests_get.side_effect = get_server
 
     public_urls = self.dash.add_graph_templates("Template:")
@@ -113,16 +123,15 @@ class TestExperimentDashboard(AppTest):
     #     4) Get two existing visualizations
     # POST calls:
     #     1) Create dashboard
-    #     2) Search queries
-    #     3) Fork query
-    #     4) Update query
-    #     5) Create visualization
-    #     6) Append visualization to dashboard
-    #     7) Repeat 2-6 six times
-    #     8) Make dashboard public
+    #     2) Create new query
+    #     3) Refresh query
+    #     4) Create visualization
+    #     5) Append visualization to dashboard
+    #     6) Repeat 2-5 six times
+    #     7) Make dashboard public
     # DELETE calls:
     #     One existing graph is removed from dashboard
     #     and deleted (2 calls)
-    self.assertEqual(self.mock_requests_post.call_count, 32)
+    self.assertEqual(self.mock_requests_post.call_count, 26)
     self.assertEqual(self.mock_requests_get.call_count, 5)
     self.assertEqual(self.mock_requests_delete.call_count, 2)

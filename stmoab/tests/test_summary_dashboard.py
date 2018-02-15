@@ -73,26 +73,23 @@ class TestSummaryDashboard(AppTest):
         "Unable to remove widget",
         lambda: self.dash.remove_graph_from_dashboard(123, 456))
 
-  def test_add_forked_query_exception_thrown(self):
+  def test_add_copied_query_exception_thrown(self):
     MOCK_WIDGET = {
         "query": "SELECT thing FROM table",
         "data_source_id": 5,
+        "type": "meep",
+        "options": "boop",
         "id": 123
     }
     QUERY_PARAMS = {"a": "b"}
 
-    def fork_query(self):
-      return MOCK_WIDGET
-
-    self._setupMockRedashClientException(
-        "fork_query", fork_query)
     self._setupMockRedashClientException("make_new_visualization_request")
 
     self.assertRaisesRegexp(
         self.dash.ExternalAPIError,
-        "Unable to add forked query",
-        lambda: self.dash._add_forked_query_to_dashboard(
-            "title", "query_id", QUERY_PARAMS, None, None))
+        "Unable to add copied query",
+        lambda: self.dash._add_copied_query_to_dashboard(
+            MOCK_WIDGET, "query_id", QUERY_PARAMS, None, None))
 
   def test_update_refresh_schedule_exception_thrown(self):
     MOCK_WIDGET = [{
