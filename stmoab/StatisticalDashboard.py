@@ -163,7 +163,7 @@ class StatisticalDashboard(ExperimentDashboard):
 
       if len(ttable_row) == 0:
         self._logger.info((
-            "StatisticalTester: "
+            "StatisticalDashboard: "
             "Query '{name}' has no relevant data and will not be "
             "included in T-Table.".format(name=event_data["title"])))
         continue
@@ -173,7 +173,7 @@ class StatisticalDashboard(ExperimentDashboard):
   def add_ttable_data(self, template_keyword, title,
                       events_list=None, events_table=None):
     self._logger.info((
-        "StatisticalTester: Adding data for "
+        "StatisticalDashboard: Adding data for "
         "{keyword}").format(keyword=template_keyword))
 
     if events_list is None:
@@ -190,8 +190,14 @@ class StatisticalDashboard(ExperimentDashboard):
         title)
 
   def add_ttable(self, title):
+    if title not in self._ttables or len(self._ttables[title]["rows"]) < 1:
+      self._logger.info((
+        "StatisticalDashboard: T-Table data for {title} is unavailable and "
+        "will not be added to dashboard.").format(title=title))
+      return
+
     self._logger.info((
-        "StatisticalTester: Creating a T-Table with "
+        "StatisticalDashboard: Creating a T-Table with "
         "title {title}").format(title=title))
 
     FILENAME = '{exp_id}_{title}'.format(exp_id=self._experiment_id, title=title)
@@ -201,7 +207,7 @@ class StatisticalDashboard(ExperimentDashboard):
     # Remove a table if it already exists
     if title in chart_data:
       self._logger.info((
-          "StatisticalTester: "
+          "StatisticalDashboard: "
           "Stale T-Table exists and will be removed"))
       query_id = chart_data[title]["query_id"]
       widget_id = chart_data[title]["widget_id"]

@@ -301,6 +301,11 @@ class TestStatisticalDashboard(AppTest):
     self.mock_requests_post.side_effect = self.post_server
 
     TABLE_NAME = "Table Name"
+
+    self.dash._ttables[TABLE_NAME] = {}
+    self.dash._ttables[TABLE_NAME]["rows"] = []
+    self.dash._ttables[TABLE_NAME]["rows"].append({"row": 1})
+
     self.dash.add_ttable_data(
         "Template:", TABLE_NAME, self.dash.DEFAULT_EVENTS)
     self.dash.add_ttable(TABLE_NAME)
@@ -378,6 +383,10 @@ class TestStatisticalDashboard(AppTest):
     self.mock_requests_delete.return_value = self.get_mock_response()
     self.mock_requests_get.side_effect = get_server
 
+    self.dash._ttables[TABLE_NAME] = {}
+    self.dash._ttables[TABLE_NAME]["rows"] = []
+    self.dash._ttables[TABLE_NAME]["rows"].append({"row": 1})
+
     self.dash.add_ttable_data(
         "Template:", TABLE_NAME)
     self.dash.add_ttable(TABLE_NAME)
@@ -391,7 +400,7 @@ class TestStatisticalDashboard(AppTest):
     #     1) Create dashboard
     #     2) Update queries (5 events * 2 requests each: update + refresh)
     #     3) Get Ttable query results for 5 rows
-    #     4) Create query (doesn't return ID, so no refresh)
+    #     4) Create query for ttable (doesn't return ID, so no refresh)
     #     5) Add query to dashboard
     #     6) Make dashboard public
     self.assertEqual(self.mock_requests_post.call_count, 19)
