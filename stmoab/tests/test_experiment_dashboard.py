@@ -49,6 +49,68 @@ class TestExperimentDashboard(AppTest):
     self.assertEqual(self.mock_requests_get.call_count, 1)
     self.assertEqual(self.mock_requests_delete.call_count, 0)
 
+  def test_add_templates_data_not_ready_returns_early(self):
+    self.get_calls = 0
+    QUERIES_IN_SEARCH = [{
+        "id": 5,
+        "description": "SomeQuery",
+        "name": "AS Template: Query Title Event",
+        "query": "SELECT * FROM table",
+        "data_source_id": 5
+    }, {
+        "id": 6,
+        "description": "SomeQuery2",
+        "name": "AS Template: Query Title",
+        "query": "SELECT * FROM table",
+        "data_source_id": 5
+    }]
+    VISUALIZATIONS_FOR_QUERY = {
+        "visualizations": [
+            {"options": {}},
+            {"options": {}}
+        ]
+    }
+
+    def get_server(url):
+      response = self.get_mock_response()
+      if self.get_calls == 0:
+        response = self.get_mock_response(
+            content=json.dumps(QUERIES_IN_SEARCH))
+      elif self.get_calls <= 2:
+        response = self.get_mock_response(
+            content=json.dumps(VISUALIZATIONS_FOR_QUERY))
+      else:
+        response = self.get_mock_response()
+
+      self.get_calls += 1
+      return response
+
+    self.server_calls = 0
+
+    self.mock_requests_delete.return_value = self.get_mock_response()
+    self.mock_requests_post.return_value = self.get_mock_response()
+    self.mock_requests_get.side_effect = get_server
+
+    public_urls = self.dash.add_graph_templates("Template:")
+
+    self.assertEqual(len(public_urls), 0)
+
+    # GET calls:
+    #     1) Create dashboard
+    #     2) Get dashboard widgets
+    #     3) Search queries
+    #     4) Get two existing visualizations
+    # POST calls:
+    #     1) Create dashboard
+    #     2) Get query results (x6)
+    #     3) Make dashboard public
+    # DELETE calls:
+    #     One existing graph is removed from dashboard
+    #     and deleted (2 calls)
+    self.assertEqual(self.mock_requests_get.call_count, 5)
+    self.assertEqual(self.mock_requests_post.call_count, 8)
+    self.assertEqual(self.mock_requests_delete.call_count, 0)
+
   def test_add_templates_makes_correct_calls(self):
     self.get_calls = 0
     QUERIES_IN_SEARCH = [{
@@ -124,7 +186,7 @@ class TestExperimentDashboard(AppTest):
     # POST calls:
     #     1) Create dashboard
     #     2) Create new query
-    #     3) Refresh query
+    #     3) Get query results
     #     4) Create visualization
     #     5) Append visualization to dashboard
     #     6) Repeat 2-5 six times

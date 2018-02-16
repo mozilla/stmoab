@@ -207,7 +207,9 @@ class ExperimentDashboard(SummaryDashboard):
             "Processing template '{template_name}'"
             .format(template_name=template["name"])))
         public_url = general_function(template, chart_data)
-        public_urls.append(public_url)
+
+        if public_url is not None:
+          public_urls.append(public_url)
 
     return public_urls
 
