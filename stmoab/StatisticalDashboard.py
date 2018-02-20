@@ -196,13 +196,27 @@ class StatisticalDashboard(ExperimentDashboard):
         "will not be added to dashboard.").format(title=title))
       return
 
+    chart_data = self.get_query_ids_and_names()
+    num_rows_current_ttable = 0
+
+    if title in chart_data:
+      data = self._get_query_results(
+          chart_data[title]["query"], self.URL_FETCHER_DATA_SOURCE_ID, title)
+      num_rows_current_ttable = len(data)
+
+    # Don't replace the existing T-Table unless we have at least an
+    # equivalent number of rows.
+    if len(self._ttables[title]["rows"]) < num_rows_current_ttable:
+      self._logger.info((
+        "StatisticalDashboard: T-Table data for {title} is incomplete and "
+        "will not be added to dashboard.").format(title=title))
+      return
+
     self._logger.info((
         "StatisticalDashboard: Creating a T-Table with "
         "title {title}").format(title=title))
 
     FILENAME = '{exp_id}_{title}'.format(exp_id=self._experiment_id, title=title)
-
-    chart_data = self.get_query_ids_and_names()
 
     # Remove a table if it already exists
     if title in chart_data:
@@ -227,4 +241,3 @@ class StatisticalDashboard(ExperimentDashboard):
         self.TTABLE_DESCRIPTION,
     )
     self._add_visualization_to_dashboard(table_id, VizWidth.WIDE)
-
