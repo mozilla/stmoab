@@ -332,6 +332,62 @@ class TestStatisticalDashboard(AppTest):
 
     mock_json_uploader.stop()
 
+  def test_no_requests_made_for_empty_ttable(self):
+    TABLE_NAME = "Table Name"
+    self.dash.add_ttable(TABLE_NAME)
+
+    # GET calls:
+    #     1) Create dashboard
+    # POST calls:
+    #     1) Create dashboard
+    #     3) Make dashboard public
+    self.assertEqual(self.mock_requests_post.call_count, 2)
+    self.assertEqual(self.mock_requests_get.call_count, 1)
+
+  def test_ttable_not_replaced_with_fewer_rows(self):
+    self.get_calls = 0
+    TABLE_NAME = "Table Name"
+    QUERY_RESULTS_RESPONSE = {
+        "query_result": {
+            "data": {
+                "rows": [{"row_1": 1}, {"row_2": 2}]
+            }
+        }
+    }
+
+    WIDGETS_RESPONSE = {
+        "widgets": [[{
+            "id": "123",
+            "visualization": {
+                "query": {
+                    "name": TABLE_NAME,
+                    "id": "abc"
+                },
+            },
+        }]]
+    }
+
+    self.mock_requests_post.return_value = self.get_mock_response(
+        content=json.dumps(QUERY_RESULTS_RESPONSE))
+    self.mock_requests_get.return_value = self.get_mock_response(
+        content=json.dumps(WIDGETS_RESPONSE))
+
+    self.dash._ttables[TABLE_NAME] = {}
+    self.dash._ttables[TABLE_NAME]["rows"] = []
+    self.dash._ttables[TABLE_NAME]["rows"].append({"row": 1})
+
+    self.dash.add_ttable(TABLE_NAME)
+
+    # GET calls:
+    #     1) Create dashboard
+    #     2) Get dashboard widgets
+    # POST calls:
+    #     1) Create dashboard
+    #     2) Get query results for existing T-Table
+    #     3) Make dashboard public
+    self.assertEqual(self.mock_requests_post.call_count, 3)
+    self.assertEqual(self.mock_requests_get.call_count, 2)
+
   def test_statistical_analysis_graph_exist_deletes_and_creates_new(self):
     self.get_calls = 0
     TABLE_NAME = "Table Name"
@@ -398,12 +454,13 @@ class TestStatisticalDashboard(AppTest):
     #     4) Get template
     # POST calls:
     #     1) Create dashboard
-    #     2) Update queries (5 events * 2 requests each: update + refresh)
-    #     3) Get Ttable query results for 5 rows
-    #     4) Create query for ttable (doesn't return ID, so no refresh)
-    #     5) Add query to dashboard
-    #     6) Make dashboard public
-    self.assertEqual(self.mock_requests_post.call_count, 19)
+    #     2) Get query results for existing T-Table
+    #     3) Update queries (5 events * 2 requests each: update + refresh)
+    #     4) Get Ttable query results for 5 rows
+    #     5) Create query for ttable (doesn't return ID, so no refresh)
+    #     6) Add query to dashboard
+    #     7) Make dashboard public
+    self.assertEqual(self.mock_requests_post.call_count, 20)
     self.assertEqual(self.mock_requests_get.call_count, 5)
     self.assertEqual(self.mock_requests_delete.call_count, 2)
 
