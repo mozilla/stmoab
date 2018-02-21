@@ -170,6 +170,18 @@ from stmoab.StatisticalDashboard import StatisticalDashboard
     "pref-flip-activity-stream-57-release-enabled-new-users-bug-1415967",
     start_date="2017-11-14"
 '''
+'''
+    "Pocket Experiment",
+    "Sponsored Stories",
+    "pref-flip-activity-stream-59-beta-pocket-sponsored-stories-bug-1432989",
+    start_date="2018-01-29"
+'''
+'''
+    "Pocket Experiment",
+    "Release Sponsored Stories",
+    "pref-flip-activity-stream-59-release-pocket-sponsored-stories-bug-1435822",
+    start_date="2018-02-12"
+'''
 
 if __name__ == '__main__':
   api_key = os.environ["REDASH_API_KEY"]
@@ -177,10 +189,16 @@ if __name__ == '__main__':
   aws_secret_key = os.environ['AWS_SECRET_KEY']
   s3_bucket_id_stats = os.environ['S3_BUCKET_ID_STATS']
 
-  PING_CENTRE_TTABLE = "Statistical Analysis - Ping Centre"
-  UT_TTABLE = "Statistical Analysis - UT"
-  UT_HOURLY_TTABLE = "Statistical Analysis (Per Active Hour) - UT"
+  # T-Table Names
+  HOURLY_TTABLE_EXISTING_USERS = "[Existing Users] Statistical Analysis (Per Active Hour) - UT"
+  HOURLY_TTABLE_NEW_USERS = "[New Users] Statistical Analysis (Per Active Hour) - UT"
+
+  # Template Keywords
   POPULATION_TEMPLATE = 'UT Experiment Template: Population Size'
+  SCALARS_TTEST_PER_ACTIVE_HOUR_EXISTING_USERS = "TTests Template Per Hour Scalars: [Existing Users]"
+  MAPS_TTEST_PER_ACTIVE_HOUR_EXISTING_USERS = "TTests Template Per Hour Maps: [Existing Users]"
+  SCALARS_TTEST_PER_ACTIVE_HOUR_NEW_USERS = "TTests Template Per Hour Scalars: [New Users]"
+  MAPS_TTEST_PER_ACTIVE_HOUR_NEW_USERS = "TTests Template Per Hour Mapped: [New Users]"
 
   dash = StatisticalDashboard(
     api_key,
@@ -190,35 +208,41 @@ if __name__ == '__main__':
     "Pocket Experiment",
     "Sponsored Stories",
     "pref-flip-activity-stream-59-beta-pocket-sponsored-stories-bug-1432989",
-    start_date="2018-01-29"
+    start_date="2018-01-29",
+    end_date="2018-02-13"
   )
 
   dash.add_graph_templates(POPULATION_TEMPLATE)
 
+  ###################################################
+  ## All of the following is based on events per day.
+  ###################################################
+
   # Average Events per Day UT
   #dash.add_graph_templates("AS Template UT One:", dash.UT_EVENTS)
   #dash.add_graph_templates("AS Template UT Mapped Two:", dash.MAPPED_UT_EVENTS)
-
-  # Average Events per Active Hour UT
-  dash.add_graph_templates("AS Template UT Three:", dash.UT_HOURLY_EVENTS)
-  dash.add_graph_templates("AS Template UT Mapped Four:", dash.MAPPED_UT_EVENTS)
-
-  # Average Events per Day Ping Centre
-  #dash.add_graph_templates("ASSA Template:", dash.DEFAULT_EVENTS)
 
   #dash.add_ttable_data("TTests Template UT Four:", UT_TTABLE, dash.UT_EVENTS)
   #dash.add_ttable_data("TTests Template Mapped UT Six:", UT_TTABLE, dash.MAPPED_UT_EVENTS)
 
   #dash.add_ttable(UT_TTABLE)
 
-  # Events per Hour TTests
-  #dash.add_ttable_data("TTests Template Per Hour UT Five:", UT_HOURLY_TTABLE, dash.UT_HOURLY_EVENTS)
-  #dash.add_ttable_data("TTests Template Per Hour Mapped UT:", UT_HOURLY_TTABLE, dash.MAPPED_UT_EVENTS)
+  ###########################################################
+  ## All of the following is based on events per active tick.
+  ###########################################################
 
-  #dash.add_ttable(UT_HOURLY_TTABLE)
+  # Existing Users
+  dash.add_graph_templates("Experiment Template Rate Scalars: [Existing Users]", dash.UT_HOURLY_EVENTS)
+  dash.add_graph_templates("Experiment Template Rate Maps: [Existing Users]", dash.MAPPED_UT_EVENTS)
 
-  #dash.add_ttable_data("TTests Template:", PING_CENTRE_TTABLE, dash.DEFAULT_EVENTS)
-  #dash.add_ttable(PING_CENTRE_TTABLE)
+  dash.add_ttable_data(SCALARS_TTEST_PER_ACTIVE_HOUR_EXISTING_USERS, HOURLY_TTABLE_EXISTING_USERS, dash.UT_HOURLY_EVENTS)
+  dash.add_ttable_data(MAPS_TTEST_PER_ACTIVE_HOUR_EXISTING_USERS, HOURLY_TTABLE_EXISTING_USERS, dash.MAPPED_UT_EVENTS)
+  dash.add_ttable(HOURLY_TTABLE_EXISTING_USERS)
 
-  #dash.update_refresh_schedule(86400)
-  #dash.remove_all_graphs()
+  # New Users
+  dash.add_graph_templates("Experiment Template Rate Scalars: [New Users]", dash.UT_HOURLY_EVENTS)
+  dash.add_graph_templates("Experiment Template Rate Maps: [New Users]", dash.MAPPED_UT_EVENTS)
+
+  dash.add_ttable_data(SCALARS_TTEST_PER_ACTIVE_HOUR_NEW_USERS, HOURLY_TTABLE_NEW_USERS, dash.UT_HOURLY_EVENTS)
+  dash.add_ttable_data(MAPS_TTEST_PER_ACTIVE_HOUR_NEW_USERS, HOURLY_TTABLE_NEW_USERS, dash.MAPPED_UT_EVENTS)
+  dash.add_ttable(HOURLY_TTABLE_NEW_USERS)
