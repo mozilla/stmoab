@@ -76,8 +76,10 @@ class ExperimentDashboard(SummaryDashboard):
 
     self._params["event"] = event
     self._params["event_string"] = event_string
-    title = description = self._get_title(template["name"]).replace(
-        "Event", event_name)
+    title = description = self._get_title(
+        template["name"]).replace(
+        "Event", event_name).replace(
+        "Scalar_parent_browser_engagement_", "")
 
     if template["description"]:
       description = template["description"].lower().replace(

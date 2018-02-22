@@ -174,7 +174,8 @@ from stmoab.StatisticalDashboard import StatisticalDashboard
     "Pocket Experiment",
     "Sponsored Stories",
     "pref-flip-activity-stream-59-beta-pocket-sponsored-stories-bug-1432989",
-    start_date="2018-01-29"
+    start_date="2018-01-29",
+    end_date="2018-02-13"
 '''
 '''
     "Pocket Experiment",

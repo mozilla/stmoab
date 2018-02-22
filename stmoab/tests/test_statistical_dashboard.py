@@ -101,7 +101,7 @@ class TestStatisticalDashboard(AppTest):
     ttable_row = self.dash._get_ttable_data_for_query(
         "beep", "meep", "boop", 5)
 
-    self.assertEqual(ttable_row, {})
+    self.assertEqual(ttable_row, [])
 
   def test_ttable_not_made_for_non_matching_graph(self):
     BAD_ROW = []
@@ -129,6 +129,7 @@ class TestStatisticalDashboard(AppTest):
 
   def test_ttable_row_data_is_correct(self):
     EXPECTED_LABEL = "beep"
+    EXPECTED_VARIANT_NAME = "experiment"
     EXPECTED_ROWS = []
     EXPECTED_MEAN_DIFFERENCE = -4
 
@@ -136,7 +137,7 @@ class TestStatisticalDashboard(AppTest):
       EXPECTED_ROWS.append({
           "date": 123,
           "count": (i % 3) + 1,
-          "type": "experiment"
+          "type": EXPECTED_VARIANT_NAME
       })
       EXPECTED_ROWS.append({
           "date": 123,
@@ -158,13 +159,19 @@ class TestStatisticalDashboard(AppTest):
     ttable_row = self.dash._get_ttable_data_for_query(
         EXPECTED_LABEL, "meep", "count", 5)
 
-    self.assertEqual(len(ttable_row), 8)
-    self.assertEqual(ttable_row["Metric"], EXPECTED_LABEL)
-    self.assertEqual(ttable_row["Alpha Error"], self.dash.ALPHA_ERROR)
-    self.assertTrue(0.5 <= ttable_row["Power"] <= 1)
-    self.assertTrue(0 <= ttable_row["Two-Tailed P-value (ttest)"] <= 0.05)
+    self.assertEqual(len(ttable_row), 1)
+    self.assertEqual(len(ttable_row[0]), 8)
     self.assertEqual(
-        ttable_row["Experiment Mean - Control Mean"], EXPECTED_MEAN_DIFFERENCE)
+        ttable_row[0]["Metric"],
+        "[control vs. {variant}] {title}".format(
+            variant=EXPECTED_VARIANT_NAME,
+            title=EXPECTED_LABEL))
+    self.assertEqual(ttable_row[0]["Alpha Error"], self.dash.ALPHA_ERROR)
+    self.assertTrue(0.5 <= ttable_row[0]["Power"] <= 1)
+    self.assertTrue(0 <= ttable_row[0]["Two-Tailed P-value (ttest)"] <= 0.05)
+    self.assertEqual(
+        ttable_row[0]["Experiment Mean - Control Mean"],
+        EXPECTED_MEAN_DIFFERENCE)
 
   def test_add_ttable_makes_correct_calls(self):
     self.get_calls = 0
