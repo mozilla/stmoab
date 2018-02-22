@@ -260,7 +260,7 @@ class SummaryDashboard(object):
 
     if data is None or len(data) == 0:
       self._logger.info((
-          "Dashboard: Query '{name}' is still updating and will not be "
+          "Dashboard: Query '{name}' is still updating and will "
           "not be displayed.".format(name=query_title)))
       return False
 

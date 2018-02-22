@@ -107,29 +107,35 @@ class StatisticalDashboard(ExperimentDashboard):
     data = self._get_query_results(query_string, data_source_id, label)
 
     if data is None or len(data) <= 3 or (column_name not in data[0]):
-      return {}
+      return []
 
     control_vals = []
-    exp_vals = []
+    exp_vals = {}
     for row in data:
-      if "type" in row and row["type"].find("control") == -1:
-        exp_vals.append(row[column_name])
-      elif "type" in row:
+      if "type" in row and row["type"].lower().find("control") != -1:
         control_vals.append(row[column_name])
-      else:
-        return {}
+      elif "type" in row:
+        if row["type"] not in exp_vals:
+          exp_vals[row["type"]] = []
 
-    results = self._power_and_ttest(control_vals, exp_vals)
-    return {
-        "Metric": label,
-        "Alpha Error": self.ALPHA_ERROR,
-        "Power": results["power"],
-        "Two-Tailed P-value (ttest)": results["p_val"],
-        "Control Mean": results["control_mean"],
-        "Experiment Mean - Control Mean": results["mean_diff"],
-        "Percent Difference in Means": results["percent_diff"],
-        "Significance": results["significance"]
-    }
+        exp_vals[row["type"]].append(row[column_name])
+      else:
+        return []
+
+    ttable_results = []
+    for variant in exp_vals:
+      results = self._power_and_ttest(control_vals, exp_vals[variant])
+      ttable_results.append({
+          "Metric": "[control vs. {variant}] {metric}".format(variant=variant, metric=label),
+          "Alpha Error": self.ALPHA_ERROR,
+          "Power": results["power"],
+          "Two-Tailed P-value (ttest)": results["p_val"],
+          "Control Mean": results["control_mean"],
+          "Experiment Mean - Control Mean": results["mean_diff"],
+          "Percent Difference in Means": results["percent_diff"],
+          "Significance": results["significance"]
+      })
+    return ttable_results
 
   def _apply_ttable_event_template(self, template, chart_data, events_list,
                                    events_table, title):
@@ -155,20 +161,20 @@ class StatisticalDashboard(ExperimentDashboard):
           options
       )
 
-      ttable_row = self._get_ttable_data_for_query(
+      ttable_rows = self._get_ttable_data_for_query(
           event_data["title"],
           query_string,
           "count",
           template["data_source_id"])
 
-      if len(ttable_row) == 0:
+      if len(ttable_rows) == 0:
         self._logger.info((
             "StatisticalDashboard: "
             "Query '{name}' has no relevant data and will not be "
             "included in T-Table.".format(name=event_data["title"])))
         continue
 
-      self._ttables[title]["rows"].append(ttable_row)
+      self._ttables[title]["rows"] = self._ttables[title]["rows"] + ttable_rows
 
   def add_ttable_data(self, template_keyword, title,
                       events_list=None, events_table=None):
