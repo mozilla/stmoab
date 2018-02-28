@@ -1,4 +1,6 @@
 import time
+from datetime import datetime
+from dateutil.parser import parse
 
 from redash_client.client import RedashClient
 from redash_client.constants import (
@@ -150,6 +152,19 @@ class SummaryDashboard(object):
           "Unable to update schedule for widget {widget_id}: {error}".format(
               widget_id=widget_id, error=e))
 
+  def get_update_range(self):
+    query_data = self.get_query_ids_and_names()
+
+    if len(query_data) < 1:
+      return {}
+
+    dates = [parse(query_data[graph]["updated_at"]) for graph in query_data]
+    update_range = {
+        "min": min(dates),
+        "max": max(dates)
+    }
+    return update_range
+
   def get_query_ids_and_names(self):
     widgets = self._get_widgets_from_dash(self._dash_name)
 
@@ -166,6 +181,9 @@ class SummaryDashboard(object):
       widget_query = widget.get(
           "visualization", {}).get("query", {}).get("query", None)
 
+      updated_at = widget.get(
+          "visualization", {}).get("query", {}).get("updated_at", None)
+
       if not widget_name:
         continue
 
@@ -173,6 +191,7 @@ class SummaryDashboard(object):
           "query_id": query_id,
           "widget_id": widget_id,
           "query": widget_query,
+          "updated_at": updated_at
       }
 
     return data
