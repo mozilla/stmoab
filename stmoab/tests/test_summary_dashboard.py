@@ -1,4 +1,5 @@
 import json
+from dateutil.parser import parse
 
 from stmoab.constants import RetentionType
 from stmoab.tests.base import AppTest
@@ -152,10 +153,12 @@ class TestSummaryDashboard(AppTest):
     EXPECTED_QUERY_NAME = "query_name123"
     EXPECTED_QUERY_NAME2 = "query_name456"
     EXPECTED_QUERY_NAME3 = "query_name789"
+    EXPECTED_UPDATED_AT = "2018-02-27T18:45:01.995651+00:00"
     WIDGETS_RESPONSE = {
         "widgets": [[{
             "visualization": {
                 "query": {
+                    "updated_at": EXPECTED_UPDATED_AT,
                     "name": EXPECTED_QUERY_NAME,
                     "id": 1
                 }
@@ -164,6 +167,7 @@ class TestSummaryDashboard(AppTest):
             [{
                 "visualization": {
                     "query": {
+                        "updated_at": EXPECTED_UPDATED_AT,
                         "not_a_name": EXPECTED_QUERY_NAME2,
                         "id": 2
                     }
@@ -172,6 +176,7 @@ class TestSummaryDashboard(AppTest):
             }, {
                 "visualization": {
                     "query": {
+                        "updated_at": EXPECTED_UPDATED_AT,
                         "name": EXPECTED_QUERY_NAME3,
                         "id": 3
                     }
@@ -191,10 +196,61 @@ class TestSummaryDashboard(AppTest):
 
     self.assertEqual(len(data_dict), 2)
     for name in data_dict:
-      self.assertEqual(len(data_dict[name]), 3)
+      self.assertEqual(len(data_dict[name]), 4)
       self.assertTrue(name in EXPECTED_NAMES)
       self.assertTrue(data_dict[name]["query_id"] in EXPECTED_QUERY_IDS)
       self.assertTrue(data_dict[name]["widget_id"] in EXPECTED_WIDGET_IDS)
+      self.assertEqual(data_dict[name]["updated_at"], EXPECTED_UPDATED_AT)
+
+  def test_get_update_range_empty(self):
+    update_range = self.dash.get_update_range()
+    self.assertEqual(len(update_range), 0)
+    self.assertEqual(update_range, {})
+
+  def test_get_update_range_correct_range(self):
+    EXPECTED_MIN_UPDATE = "2018-02-27T18:47:41.932017+00:00"
+    EXPECTED_MID_UPDATE = "2018-02-27T18:48:11.295060+00:00"
+    EXPECTED_MAX_UPDATE = "2018-02-27T18:59:05.862722+00:00"
+    WIDGETS_RESPONSE = {
+        "widgets": [[{
+            "visualization": {
+                "query": {
+                    "updated_at": EXPECTED_MIN_UPDATE,
+                    "name": "name1",
+                    "id": 1
+                }
+            },
+            "id": 4}],
+            [{
+                "visualization": {
+                    "query": {
+                        "updated_at": EXPECTED_MID_UPDATE,
+                        "name": "name2",
+                        "id": 2
+                    }
+                },
+                "id": 5
+            }, {
+                "visualization": {
+                    "query": {
+                        "updated_at": EXPECTED_MAX_UPDATE,
+                        "name": "name3",
+                        "id": 3
+                    }
+                },
+                "id": 6
+            }
+        ]]
+    }
+    self.mock_requests_get.return_value = self.get_mock_response(
+        content=json.dumps(WIDGETS_RESPONSE))
+
+    update_range = self.dash.get_update_range()
+    self.assertEqual(len(update_range), 2)
+    self.assertTrue("min" in update_range)
+    self.assertTrue("max" in update_range)
+    self.assertEqual(update_range["min"], parse(EXPECTED_MIN_UPDATE))
+    self.assertEqual(update_range["max"], parse(EXPECTED_MAX_UPDATE))
 
   def test_remove_all_graphs_success(self):
     EXPECTED_QUERY_ID = "query_id123"
