@@ -25,7 +25,7 @@ class StatisticalDashboard(ExperimentDashboard):
 
 
   def __init__(
-      self, api_key, aws_access_key, aws_secret_key,
+      self, api_key, aws_access_key, aws_secret_key, s3_region,
       s3_bucket_id, project_name, dash_name, exp_id,
       start_date=None, end_date=None
   ):
@@ -39,7 +39,8 @@ class StatisticalDashboard(ExperimentDashboard):
 
     self._ttables = {}
     self._s3_bucket = s3_bucket_id
-    self._transfer = create_boto_transfer(aws_access_key, aws_secret_key)
+    self._transfer = create_boto_transfer(
+      aws_access_key, aws_secret_key, s3_region)
 
   def _copy_ttable_tempalte(self):
     template_copy = self.TTABLE_TEMPLATE.copy()

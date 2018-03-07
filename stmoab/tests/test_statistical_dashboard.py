@@ -18,6 +18,7 @@ class TestStatisticalDashboard(AppTest):
   EXPERIMENT_ID = "exp-014-screenshotsasync"
   AWS_ACCESS_KEY = "access"
   AWS_SECRET_KEY = "secret"
+  AWS_REGION = "us-west-2"
   AWS_BUCKET_ID = "bucket"
 
   def get_dashboard(self, api_key):
@@ -32,6 +33,7 @@ class TestStatisticalDashboard(AppTest):
         self.API_KEY,
         self.AWS_ACCESS_KEY,
         self.AWS_SECRET_KEY,
+        self.AWS_REGION,
         self.AWS_BUCKET_ID,
         self.DASH_PROJECT,
         self.DASH_NAME,

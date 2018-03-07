@@ -188,6 +188,7 @@ if __name__ == '__main__':
   api_key = os.environ["REDASH_API_KEY"]
   aws_access_key = os.environ['AWS_ACCESS_KEY']
   aws_secret_key = os.environ['AWS_SECRET_KEY']
+  s3_region = os.environ['S3_REGION']
   s3_bucket_id_stats = os.environ['S3_BUCKET_ID_STATS']
 
   # T-Table Names
@@ -205,12 +206,12 @@ if __name__ == '__main__':
     api_key,
     aws_access_key,
     aws_secret_key,
+    s3_region,
     s3_bucket_id_stats,
     "Pocket Experiment",
-    "Sponsored Stories",
-    "pref-flip-activity-stream-59-beta-pocket-sponsored-stories-bug-1432989",
-    start_date="2018-01-29",
-    end_date="2018-02-13"
+    "Release Sponsored Stories",
+    "pref-flip-activity-stream-59-release-pocket-sponsored-stories-bug-1435822",
+    start_date="2018-02-12"
   )
 
   dash.add_graph_templates(POPULATION_TEMPLATE)

@@ -18,6 +18,7 @@ class TestUtils(AppTest):
     FILENAME = "test_file_name"
     ACCESS_KEY = "key"
     SECRET_KEY = "secret"
+    REGION = "us-west-2"
     BUCKET_ID = "bucket"
     DATA = {"columns": TTableSchema, "rows": []}
 
@@ -27,7 +28,7 @@ class TestUtils(AppTest):
     mock_boto_transfer_patcher = mock.patch("stmoab.utils.S3Transfer")
     mock_boto_transfer_patcher.start()
 
-    transfer = create_boto_transfer(ACCESS_KEY, SECRET_KEY)
+    transfer = create_boto_transfer(ACCESS_KEY, SECRET_KEY, REGION)
     query_string = upload_as_json(DIRECTORY_NAME, FILENAME, transfer, BUCKET_ID, DATA)
 
     self.assertEqual(query_string, EXPECTED_BASE_URL + EXPECTED_S3_KEY)

@@ -8,10 +8,10 @@ from datetime import datetime, timedelta
 s3 = boto3.client("s3")
 
 
-def create_boto_transfer(access_key, secret_key):
+def create_boto_transfer(access_key, secret_key, region):
   client = boto3.client(
       "s3",
-      region_name="us-west-2",
+      region_name=region,
       aws_access_key_id=access_key,
       aws_secret_access_key=secret_key)
   transfer = S3Transfer(client)
