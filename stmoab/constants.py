@@ -1,7 +1,3 @@
-class RetentionType:
-  DAILY = "day"
-  WEEKLY = "week"
-
 TTableSchema = [
     {
         "name": "Metric",
