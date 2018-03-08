@@ -6,36 +6,9 @@ from redash_client.client import RedashClient
 from redash_client.constants import (
     VizWidth, VizType, ChartType, TimeInterval)
 
-from stmoab.templates import retention, all_events_weekly, active_users
-from stmoab.constants import RetentionType
-
 
 class SummaryDashboard(object):
   TILES_DATA_SOURCE_ID = 5
-  DAILY_RETENTION_TITLE = "Daily Retention"
-  WEEKLY_RETENTION_TITLE = "Weekly Retention"
-  EVENTS_WEEKLY_TITLE = "Weely Events"
-  MAU_DAU_TITLE = "Engagement"
-  MAU_DAU_SERIES_OPTIONS = {
-      "mau": {
-          "type": ChartType.AREA,
-          "yAxis": 0,
-          "zIndex": 0,
-          "index": 0
-      },
-      "wau": {
-          "type": ChartType.AREA,
-          "yAxis": 0,
-          "zIndex": 1,
-          "index": 0
-      },
-      "dau": {
-          "type": ChartType.AREA,
-          "yAxis": 0,
-          "zIndex": 2,
-          "index": 0
-      },
-  }
 
   class ExternalAPIError(Exception):
     pass
@@ -219,27 +192,6 @@ class SummaryDashboard(object):
 
       self.remove_graph_from_dashboard(widget_id, query_id)
 
-  def _get_mau_dau_column_mappings(self, query_fields):
-    mau_dau_column_mapping = {
-        # Date
-        query_fields[0]: "x",
-        # DAU
-        query_fields[1]: "y",
-        # WAU
-        query_fields[2]: "y",
-        # MAU
-        query_fields[3]: "y",
-    }
-    engagement_ratio_column_mapping = {
-        # Date
-        query_fields[0]: "x",
-        # Weekly Engagement
-        query_fields[4]: "y",
-        # Montly Engagement
-        query_fields[5]: "y",
-    }
-    return mau_dau_column_mapping, engagement_ratio_column_mapping
-
   def _populate_sql_string_with_variables(self, template_sql, query_params):
     adjusted_string = template_sql.replace("{{{", "{").replace("}}}", "}")
     sql_query = adjusted_string.format(**query_params)
@@ -305,86 +257,3 @@ class SummaryDashboard(object):
         stacking,
     )
     self._add_visualization_to_dashboard(viz_id, visualization_width)
-
-  def add_mau_dau(self, where_clause=""):
-    if self.MAU_DAU_TITLE in self.get_query_ids_and_names():
-      return
-
-    query_string, fields = active_users(
-        self._events_table, self._start_date, where_clause)
-
-    mau_dau_mapping, er_mapping = self._get_mau_dau_column_mappings(fields)
-
-    # Make the MAU/WAU/DAU graph
-    self._add_query_to_dashboard(
-        self.MAU_DAU_TITLE,
-        query_string,
-        self.TILES_DATA_SOURCE_ID,
-        VizWidth.WIDE,
-        VizType.CHART,
-        "",
-        ChartType.AREA,
-        mau_dau_mapping,
-        series_options=self.MAU_DAU_SERIES_OPTIONS,
-    )
-
-    # Make the engagement ratio graph
-    self._add_query_to_dashboard(
-        self.MAU_DAU_TITLE,
-        query_string,
-        self.TILES_DATA_SOURCE_ID,
-        VizWidth.WIDE,
-        VizType.CHART,
-        "",
-        ChartType.LINE,
-        er_mapping,
-    )
-
-  def add_retention_graph(self, retention_type, where_clause=""):
-    time_interval = TimeInterval.WEEKLY
-    graph_title = self.WEEKLY_RETENTION_TITLE
-
-    if retention_type == RetentionType.DAILY:
-      time_interval = TimeInterval.DAILY
-      graph_title = self.DAILY_RETENTION_TITLE
-
-    current_charts = self.get_query_ids_and_names()
-    if graph_title in current_charts:
-      return
-
-    query_string, fields = retention(
-        self._events_table, retention_type, self._start_date, where_clause)
-
-    self._add_query_to_dashboard(
-        graph_title,
-        query_string,
-        self.TILES_DATA_SOURCE_ID,
-        VizWidth.WIDE,
-        VizType.COHORT,
-        time_interval=time_interval,
-    )
-
-  def add_events_weekly(self, where_clause="", event_column="event_type"):
-    if self.EVENTS_WEEKLY_TITLE in self.get_query_ids_and_names():
-      return
-
-    query_string, fields = all_events_weekly(
-        self._events_table, self._start_date, where_clause, event_column)
-
-    column_mapping = {
-        fields[0]: "x",
-        fields[1]: "y",
-        fields[2]: "series",
-    }
-
-    self._add_query_to_dashboard(
-        self.EVENTS_WEEKLY_TITLE,
-        query_string,
-        self.TILES_DATA_SOURCE_ID,
-        VizWidth.WIDE,
-        VizType.CHART,
-        "",
-        ChartType.BAR,
-        column_mapping,
-        stacking=True
-    )
