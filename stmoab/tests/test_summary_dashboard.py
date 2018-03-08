@@ -1,6 +1,8 @@
 import json
 from dateutil.parser import parse
 
+from redash_client.constants import VizWidth, ChartType
+
 from stmoab.tests.base import AppTest
 from stmoab.SummaryDashboard import SummaryDashboard
 
@@ -293,3 +295,34 @@ class TestSummaryDashboard(AppTest):
     self.assertEqual(self.mock_requests_post.call_count, 2)
     self.assertEqual(self.mock_requests_get.call_count, 2)
     self.assertEqual(self.mock_requests_delete.call_count, 6)
+
+  def test_add_query_to_dashboard_makes_expected_calls(self):
+    QUERY_TITLE = "title"
+    QUERY_STRING = "SELECT * FROM test"
+
+    MAU_DAU_COLUMN_MAPPING = {
+        "a": "x",
+        "b": "y",
+        "c": "y",
+        "d": "y"
+    }
+
+    self.dash._add_query_to_dashboard(
+        QUERY_TITLE,
+        QUERY_STRING,
+        5,
+        VizWidth.WIDE,
+        column_mapping=MAU_DAU_COLUMN_MAPPING,
+        chart_type=ChartType.BAR
+    )
+
+    # POST calls:
+    #     1) Create dashboard
+    #     2) Create new query
+    #     3) Create new visualization
+    #     4) Add visualization to dashboard
+    #     5) Make dashboard public
+    # GET calls:
+    #     1) Create dashboard
+    self.assertEqual(self.mock_requests_post.call_count, 5)
+    self.assertEqual(self.mock_requests_get.call_count, 1)
