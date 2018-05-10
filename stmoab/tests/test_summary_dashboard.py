@@ -117,23 +117,27 @@ class TestSummaryDashboard(AppTest):
   def test_update_refresh_schedule_success(self):
     EXPECTED_QUERY_ID = "query_id123"
     WIDGETS_RESPONSE = {
-        "widgets": [[{
-            "visualization": {
-                "query": {
-                    "nope": "fail"
+        "widgets": [
+            {
+                "visualization": {
+                    "query": {
+                        "nope": "fail"
+                    }
                 }
-            }}],
-            [{"visualization": {
-                "query": {
-                    "id": EXPECTED_QUERY_ID
+            }, {
+                "visualization": {
+                    "query": {
+                        "id": EXPECTED_QUERY_ID
+                    }
                 }
-            }},
-            {"visualization": {
-                "query": {
-                    "muhahaha": "you can't catch me!"
+            }, {
+                "visualization": {
+                    "query": {
+                        "muhahaha": "you can't catch me!"
+                    }
                 }
-            }}
-        ]]
+            }
+        ]
     }
 
     self.mock_requests_get.return_value = self.get_mock_response(
@@ -155,16 +159,17 @@ class TestSummaryDashboard(AppTest):
     EXPECTED_QUERY_NAME3 = "query_name789"
     EXPECTED_UPDATED_AT = "2018-02-27T18:45:01.995651+00:00"
     WIDGETS_RESPONSE = {
-        "widgets": [[{
-            "visualization": {
-                "query": {
-                    "updated_at": EXPECTED_UPDATED_AT,
-                    "name": EXPECTED_QUERY_NAME,
-                    "id": 1
-                }
-            },
-            "id": 4}],
-            [{
+        "widgets": [
+            {
+                "visualization": {
+                    "query": {
+                        "updated_at": EXPECTED_UPDATED_AT,
+                        "name": EXPECTED_QUERY_NAME,
+                        "id": 1
+                    }
+                },
+                "id": 4
+            }, {
                 "visualization": {
                     "query": {
                         "updated_at": EXPECTED_UPDATED_AT,
@@ -183,7 +188,7 @@ class TestSummaryDashboard(AppTest):
                 },
                 "id": 6
             }
-        ]]
+        ]
     }
     EXPECTED_NAMES = [EXPECTED_QUERY_NAME, EXPECTED_QUERY_NAME3]
     EXPECTED_QUERY_IDS = [1, 3]
@@ -212,16 +217,17 @@ class TestSummaryDashboard(AppTest):
     EXPECTED_MID_UPDATE = "2018-02-27T18:48:11.295060+00:00"
     EXPECTED_MAX_UPDATE = "2018-02-27T18:59:05.862722+00:00"
     WIDGETS_RESPONSE = {
-        "widgets": [[{
-            "visualization": {
-                "query": {
-                    "updated_at": EXPECTED_MIN_UPDATE,
-                    "name": "name1",
-                    "id": 1
-                }
-            },
-            "id": 4}],
-            [{
+        "widgets": [
+            {
+                "visualization": {
+                    "query": {
+                        "updated_at": EXPECTED_MIN_UPDATE,
+                        "name": "name1",
+                        "id": 1
+                    }
+                },
+                "id": 4
+            }, {
                 "visualization": {
                     "query": {
                         "updated_at": EXPECTED_MID_UPDATE,
@@ -240,7 +246,7 @@ class TestSummaryDashboard(AppTest):
                 },
                 "id": 6
             }
-        ]]
+        ]
     }
     self.mock_requests_get.return_value = self.get_mock_response(
         content=json.dumps(WIDGETS_RESPONSE))
@@ -257,14 +263,16 @@ class TestSummaryDashboard(AppTest):
     EXPECTED_QUERY_ID2 = "query_id456"
     EXPECTED_QUERY_ID3 = "query_id789"
     WIDGETS_RESPONSE = {
-        "widgets": [[{
-            "id": EXPECTED_QUERY_ID,
-            "visualization": {
-                "query": {
-                    "id": EXPECTED_QUERY_ID,
-                    "name": "A"
+        "widgets": [
+            {
+                "id": EXPECTED_QUERY_ID,
+                "visualization": {
+                    "query": {
+                        "id": EXPECTED_QUERY_ID,
+                        "name": "A"
+                    }
                 }
-            }}], [{
+            }, {
                 "id": EXPECTED_QUERY_ID2,
                 "visualization": {
                     "query": {
@@ -281,7 +289,7 @@ class TestSummaryDashboard(AppTest):
                     }
                 }
             }
-        ]]
+        ]
     }
 
     self.mock_requests_delete.return_value = self.get_mock_response()

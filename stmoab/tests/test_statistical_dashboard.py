@@ -191,13 +191,13 @@ class TestStatisticalDashboard(AppTest):
         ]
     }
     WIDGETS_RESPONSE = {
-        "widgets": [[{
+        "widgets": [{
             "visualization": {
                 "query": {
                     "name": "Some table",
                 },
             },
-        }]]
+        }]
     }
     EXPECTED_ROWS = [{
         "count": 123,
@@ -277,13 +277,13 @@ class TestStatisticalDashboard(AppTest):
         ]
     }
     WIDGETS_RESPONSE = {
-        "widgets": [[{
+        "widgets": [{
             "visualization": {
                 "query": {
                     "name": "Some Graph",
                 },
             },
-        }]]
+        }]
     }
 
     def get_server(url):
@@ -365,7 +365,7 @@ class TestStatisticalDashboard(AppTest):
     }
 
     WIDGETS_RESPONSE = {
-        "widgets": [[{
+        "widgets": [{
             "id": "123",
             "visualization": {
                 "query": {
@@ -373,7 +373,7 @@ class TestStatisticalDashboard(AppTest):
                     "id": "abc"
                 },
             },
-        }]]
+        }]
     }
 
     self.mock_requests_post.return_value = self.get_mock_response(
@@ -414,7 +414,7 @@ class TestStatisticalDashboard(AppTest):
         ]
     }
     WIDGETS_RESPONSE = {
-        "widgets": [[{
+        "widgets": [{
             "id": "123",
             "visualization": {
                 "query": {
@@ -422,7 +422,7 @@ class TestStatisticalDashboard(AppTest):
                     "id": "abc"
                 },
             },
-        }]]
+        }]
     }
 
     def get_server(url):

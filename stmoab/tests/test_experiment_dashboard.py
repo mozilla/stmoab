@@ -140,7 +140,7 @@ class TestExperimentDashboard(AppTest):
         ]
     }
     WIDGETS_RESPONSE = {
-        "widgets": [[{
+        "widgets": [{
             "id": "the_widget_id",
             "visualization": {
                 "query": {
@@ -148,7 +148,7 @@ class TestExperimentDashboard(AppTest):
                     "name": "Query Title Click"
                 },
             },
-        }]]
+        }]
     }
 
     def get_server(url):
