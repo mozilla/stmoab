@@ -26,7 +26,11 @@ class SummaryDashboard(object):
 
     try:
       self.redash = RedashClient(api_key)
-      self._dash_id = self.redash.create_new_dashboard(self._dash_name)
+
+      dash_info = self.redash.create_new_dashboard(self._dash_name)
+      self._dash_id = dash_info["dashboard_id"]
+      self.slug_url = dash_info["slug_url"]
+
       self.redash.publish_dashboard(self._dash_id)
       self.public_url = self.redash.get_public_url(self._dash_id)
     except self.redash.RedashClientException as e:

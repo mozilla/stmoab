@@ -15,7 +15,15 @@ class TestExperimentDashboard(AppTest):
   EXPERIMENT_ID = "exp-014-screenshotsasync"
 
   def get_dashboard(self, api_key):
-    self.mock_requests_get.return_value = self.get_mock_response()
+    EXPECTED_QUERY_ID = "query_id123"
+    EXPECTED_SLUG = "some_slug_it_made"
+    QUERY_ID_RESPONSE = {
+        "id": EXPECTED_QUERY_ID,
+        "slug": EXPECTED_SLUG
+    }
+
+    self.mock_requests_get.return_value = self.get_mock_response(
+        content=json.dumps(QUERY_ID_RESPONSE))
     self.mock_requests_post.return_value = self.get_mock_response()
 
     dashboard = ExperimentDashboard(
