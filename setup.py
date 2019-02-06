@@ -13,7 +13,7 @@ setup(
     "boto3 == 1.4.4",
     "scipy == 1.0.0",
     "statistics == 1.0.3.5",
-    "statsmodels == 0.6.1",
+    "statsmodels == 0.9.0",
     "urllib3 == 1.24.1",
     "redash_client == 0.2.5"
   ]
