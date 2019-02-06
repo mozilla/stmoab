@@ -59,19 +59,21 @@ class TestExperimentDashboard(AppTest):
 
   def test_add_templates_data_not_ready_returns_early(self):
     self.get_calls = 0
-    QUERIES_IN_SEARCH = [{
-        "id": 5,
-        "description": "SomeQuery",
-        "name": "AS Template: Query Title Event",
-        "query": "SELECT * FROM table",
-        "data_source_id": 5
-    }, {
-        "id": 6,
-        "description": "SomeQuery2",
-        "name": "AS Template: Query Title",
-        "query": "SELECT * FROM table",
-        "data_source_id": 5
-    }]
+    QUERIES_IN_SEARCH = {
+        "results": [{
+            "id": 5,
+            "description": "SomeQuery",
+            "name": "AS Template: Query Title Event",
+            "query": "SELECT * FROM table",
+            "data_source_id": 5
+        }, {
+            "id": 6,
+            "description": "SomeQuery2",
+            "name": "AS Template: Query Title",
+            "query": "SELECT * FROM table",
+            "data_source_id": 5
+        }]
+    }
     VISUALIZATIONS_FOR_QUERY = {
         "visualizations": [
             {"options": {}},
@@ -121,19 +123,21 @@ class TestExperimentDashboard(AppTest):
 
   def test_add_templates_makes_correct_calls(self):
     self.get_calls = 0
-    QUERIES_IN_SEARCH = [{
-        "id": 5,
-        "description": "SomeQuery",
-        "name": "AS Template: Query Title Event",
-        "query": "SELECT * FROM table",
-        "data_source_id": 5
-    }, {
-        "id": 6,
-        "description": "SomeQuery2",
-        "name": "AS Template: Query Title",
-        "query": "SELECT * FROM table",
-        "data_source_id": 5
-    }]
+    QUERIES_IN_SEARCH = {
+        "results": [{
+            "id": 5,
+            "description": "SomeQuery",
+            "name": "AS Template: Query Title Event",
+            "query": "SELECT * FROM table",
+            "data_source_id": 5
+        }, {
+            "id": 6,
+            "description": "SomeQuery2",
+            "name": "AS Template: Query Title",
+            "query": "SELECT * FROM table",
+            "data_source_id": 5
+        }]
+    }
     QUERY_RESULTS_RESPONSE = {
         "query_result": {
             "data": {

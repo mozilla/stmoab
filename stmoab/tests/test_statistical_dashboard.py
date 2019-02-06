@@ -186,13 +186,15 @@ class TestStatisticalDashboard(AppTest):
   def test_add_ttable_makes_correct_calls(self):
     self.get_calls = 0
     self.server_calls = 0
-    QUERIES_IN_SEARCH = [{
-        "id": 5,
-        "description": "SomeQuery",
-        "name": "AS Template: Query Title Event",
-        "data_source_id": 5,
-        "query": "SELECT stuff FROM things"
-    }]
+    QUERIES_IN_SEARCH = {
+        "results": [{
+            "id": 5,
+            "description": "SomeQuery",
+            "name": "AS Template: Query Title Event",
+            "data_source_id": 5,
+            "query": "SELECT stuff FROM things"
+        }]
+    }
     VISUALIZATIONS_FOR_QUERY = {
         "visualizations": [
             {"options": {}},
@@ -271,13 +273,15 @@ class TestStatisticalDashboard(AppTest):
   def test_ttable_with_no_rows(self):
     self.get_calls = 0
     self.server_calls = 0
-    QUERIES_IN_SEARCH = [{
-        "id": 5,
-        "description": "SomeQuery",
-        "name": "AS Template: Query Title Event",
-        "data_source_id": 5,
-        "query": "SELECT stuff FROM things"
-    }]
+    QUERIES_IN_SEARCH = {
+        "results": [{
+            "id": 5,
+            "description": "SomeQuery",
+            "name": "AS Template: Query Title Event",
+            "data_source_id": 5,
+            "query": "SELECT stuff FROM things"
+        }]
+    }
     VISUALIZATIONS_FOR_QUERY = {
         "visualizations": [
             {"options": {}},
@@ -408,13 +412,15 @@ class TestStatisticalDashboard(AppTest):
   def test_statistical_analysis_graph_exist_deletes_and_creates_new(self):
     self.get_calls = 0
     TABLE_NAME = "Table Name"
-    QUERIES_IN_SEARCH = [{
-        "id": 5,
-        "description": "SomeQuery",
-        "name": "AS Template: Query Title Event",
-        "data_source_id": 5,
-        "query": "SELECT stuff FROM things"
-    }]
+    QUERIES_IN_SEARCH = {
+        "results": [{
+            "id": 5,
+            "description": "SomeQuery",
+            "name": "AS Template: Query Title Event",
+            "data_source_id": 5,
+            "query": "SELECT stuff FROM things"
+        }]
+    }
     VISUALIZATIONS_FOR_QUERY = {
         "visualizations": [
             {"options": {}},
