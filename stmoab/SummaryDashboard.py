@@ -8,7 +8,6 @@ from redash_client.constants import (
 
 
 class SummaryDashboard(object):
-  TILES_DATA_SOURCE_ID = 5
 
   class ExternalAPIError(Exception):
     pass
