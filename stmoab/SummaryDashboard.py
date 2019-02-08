@@ -57,10 +57,18 @@ class SummaryDashboard(object):
         "Unable to fetch query results: '{query_name}' "
         " {error}".format(query_name=query_name, error=e))
 
-  def _create_new_visualization(self, query_id, visualization_type,
-                                visualization_name, chart_type,
-                                column_mapping, series_options,
-                                time_interval, stacking):
+  def _create_new_visualization(
+      self,
+      query_id,
+      visualization_type,
+      visualization_name,
+      chart_type,
+      column_mapping,
+      series_options,
+      time_interval,
+      stacking,
+      axis_info
+  ):
     try:
       viz_id = self.redash.create_new_visualization(
           query_id,
@@ -71,6 +79,7 @@ class SummaryDashboard(object):
           series_options,
           time_interval,
           stacking,
+          axis_info,
       )
       return viz_id
     except self.redash.RedashClientException as e:
@@ -242,7 +251,8 @@ class SummaryDashboard(object):
     column_mapping=None,
     series_options=None,
     time_interval=None,
-    stacking=True
+    stacking=True,
+    axis_info={}
   ):
     query_id, table_id = self._create_new_query(
         query_title, query_string, data_source)
@@ -255,5 +265,6 @@ class SummaryDashboard(object):
         series_options,
         time_interval,
         stacking,
+        axis_info,
     )
     self._add_visualization_to_dashboard(viz_id, visualization_width)

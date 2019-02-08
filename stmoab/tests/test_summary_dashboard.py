@@ -56,7 +56,7 @@ class TestSummaryDashboard(AppTest):
         self.dash.ExternalAPIError,
         "Unable to create visualization titled",
         lambda: self.dash._create_new_visualization(
-            "a", "b", "c", "d", "e", "f", "g", "h"))
+            "a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
   def test_get_widgets_from_dash_exception_thrown(self):
     self._setupMockRedashClientException("get_widget_from_dash")
