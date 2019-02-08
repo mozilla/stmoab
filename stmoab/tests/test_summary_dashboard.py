@@ -315,7 +315,7 @@ class TestSummaryDashboard(AppTest):
         "d": "y"
     }
 
-    self.dash._add_query_to_dashboard(
+    self.dash.add_query_to_dashboard(
         QUERY_TITLE,
         QUERY_STRING,
         5,

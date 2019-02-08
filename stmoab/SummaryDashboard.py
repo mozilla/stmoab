@@ -230,13 +230,20 @@ class SummaryDashboard(object):
 
     return True
 
-  def _add_query_to_dashboard(self, query_title, query_string,
-                              data_source, visualization_width,
-                              visualization_type=VizType.CHART,
-                              visualization_name="", chart_type=None,
-                              column_mapping=None, series_options=None,
-                              time_interval=None, stacking=True):
-
+  def add_query_to_dashboard(
+    self,
+    query_title,
+    query_string,
+    data_source,
+    visualization_width,
+    visualization_type=VizType.CHART,
+    visualization_name="",
+    chart_type=None,
+    column_mapping=None,
+    series_options=None,
+    time_interval=None,
+    stacking=True
+  ):
     query_id, table_id = self._create_new_query(
         query_title, query_string, data_source)
     viz_id = self._create_new_visualization(
