@@ -1,3 +1,4 @@
+import time
 import logging
 
 from redash_client.constants import VizWidth
@@ -38,21 +39,26 @@ class ExperimentDashboard(SummaryDashboard):
   RETENTION_DIFF_TITLE = "Daily Retention Difference (Experiment - Control)"
 
   def __init__(self, api_key, project_name, dash_name, exp_id,
-               start_date=None, end_date=None):
+               start_date, end_date=None, events_table_name=None):
     DASH_TITLE = "{project}: {dash}".format(
         project=project_name, dash=dash_name)
     super(ExperimentDashboard, self).__init__(
         api_key,
-        DASH_TITLE,
-        self.DEFAULT_EVENTS_TABLE,
-        start_date, end_date)
+        DASH_TITLE)
 
     logging.basicConfig()
     self._logger = logging.getLogger()
     self._logger.setLevel(logging.INFO)
     self._experiment_id = exp_id
+    self._start_date = start_date
+    self._end_date = end_date if end_date else time.strftime("%Y-%m-%d")
+    self._events_table = events_table_name or self.DEFAULT_EVENTS_TABLE
+    self._params = {
+        "start_date": self._start_date,
+        "end_date": self._end_date,
+        "experiment_id": self._experiment_id
+    }
 
-    self._params["experiment_id"] = self._experiment_id
     self._logger.info((
         "ExperimentDashboard: {name} "
         "Initialization Complete".format(name=dash_name)))

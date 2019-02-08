@@ -15,7 +15,7 @@ class TestSummaryDashboard(AppTest):
     self.assertRaisesRegexp(
         self.dash.ExternalAPIError,
         "Unable to create new dashboard",
-        lambda: SummaryDashboard("a", "b", "c", "d",))
+        lambda: SummaryDashboard("a", "b",))
 
   def test_add_visualization_to_dash_exception_thrown(self):
     self._setupMockRedashClientException("add_visualization_to_dashboard")

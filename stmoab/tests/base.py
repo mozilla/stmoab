@@ -37,10 +37,7 @@ class AppTest(unittest.TestCase):
     return response
 
   def get_dashboard(self, api_key):
-    EVENTS_TABLE_NAME = "activity_stream_mobile_events_daily"
-    START_DATE = "02/17/2017"
     DASH_NAME = "Firefox iOS: Metrics Summary"
-
     EXPECTED_QUERY_ID = "query_id123"
     EXPECTED_SLUG = "some_slug_it_made"
     QUERY_ID_RESPONSE = {
@@ -55,8 +52,6 @@ class AppTest(unittest.TestCase):
     dashboard = SummaryDashboard(
         self.API_KEY,
         DASH_NAME,
-        EVENTS_TABLE_NAME,
-        START_DATE,
     )
     return dashboard
 

@@ -1,5 +1,3 @@
-import time
-from datetime import datetime
 from dateutil.parser import parse
 
 from redash_client.client import RedashClient
@@ -12,16 +10,8 @@ class SummaryDashboard(object):
   class ExternalAPIError(Exception):
     pass
 
-  def __init__(self, api_key, dash_name, events_table_name,
-               start_date, end_date=None):
+  def __init__(self, api_key, dash_name):
     self._dash_name = dash_name
-    self._events_table = events_table_name
-    self._start_date = start_date
-    self._end_date = end_date if end_date else time.strftime("%Y-%m-%d")
-    self._params = {
-        "start_date": self._start_date,
-        "end_date": self._end_date
-    }
 
     try:
       self.redash = RedashClient(api_key)
