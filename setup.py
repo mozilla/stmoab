@@ -11,7 +11,7 @@ setup(
   classifiers = [],
   install_requires=[
     "boto3 == 1.4.4",
-    "scipy == 1.0.0",
+    "scipy == 1.10.0",
     "statistics == 1.0.3.5",
     "statsmodels == 0.9.0",
     "urllib3 == 1.24.1",
