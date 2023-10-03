@@ -14,7 +14,7 @@ setup(
     "scipy == 1.0.0",
     "statistics == 1.0.3.5",
     "statsmodels == 0.9.0",
-    "urllib3 == 1.24.1",
+    "urllib3 == 1.26.17",
     "redash_client == 0.2.7"
   ]
 )
